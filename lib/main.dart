@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Persistence/local_store.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,6 +51,16 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    LocalStore.getInstance().readCounter().then((value) {  // HIGHLIGHT: `/then` addresses async
+      setState(() {
+        _counter = value;
+      });
+    });
+  }
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -59,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+    LocalStore.getInstance().writeCounter(_counter);
   }
 
   @override
