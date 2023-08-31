@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
@@ -20,25 +21,48 @@ class LocalStore {
     return directory.path;
   }
 
-  Future<File> get _localFile async {
+  Future<File> get _ctrFile async {
     final path = await _localPath;
     return File('$path/counter.txt');
   }
 
   Future<File> writeCounter(int counter) async {
-    final file = await _localFile;
+    final file = await _ctrFile;
     return file.writeAsString('$counter');
   }
 
   Future<int> readCounter() async {
     try {
-      final file = await _localFile;
+      final file = await _ctrFile;
       final contents = await file.readAsString();
       return int.parse(contents);
     }
     catch (e) {
       // Assume no data found, indicating no previous access
       return 0;
+    }
+  }
+
+  Future<File> get _idxFile async {
+    final path = await _localPath;
+    return File('$path/index.txt');
+  }
+
+  Future<File> writeIndex(Map<String,String> idx) async {
+    final file = await _idxFile;
+    final String idxStr = jsonEncode(idx);
+    return file.writeAsString(idxStr);
+  }
+
+  Future<Map<String, String>> readIndex() async {
+    try {
+      final file = await _idxFile;
+      final contents = await file.readAsString();
+      return json.decode(contents);
+    }
+    catch (e) {
+      // Assume no data found, indicating no previous access
+      return {};
     }
   }
 }
