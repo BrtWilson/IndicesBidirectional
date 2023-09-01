@@ -50,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   final keyController = TextEditingController();
   final valController = TextEditingController();
+  late Future<Map<String,String>> f_index;
 
   @override
   void initState() {
@@ -62,8 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _counter = value;
     });
-    context.read<AppState>().initialize();
     _incrementCounter();
+    f_index = context.read<AppState>().initialize();
   }
 
   void _incrementCounter() {
@@ -108,25 +109,84 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Text("Add to Index"),
             ),
             Container(
-              height: MediaQuery.of(context).size.height - 400,
+              //height: MediaQuery.of(context).size.height - 400,
               child:
-              ListView(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Text('You have '
-                        '${appState.index.length} entries in your index:'),
-                  ),
-                  for (var entry in appState.index.entries)
-                    ListTile(
-                      leading: const Icon(Icons.arrow_right),
-                      title: Text(AppConstants.entryText(entry)),
-                    ),
-                ],
-              ),
+                FutureBuilder<Map<String,String>>(
+                  future: f_index,
+                  builder: (BuildContext context, AsyncSnapshot<Map<String,String>> snapshot) {
+                    List<Widget> children;
+                    if (snapshot.hasData) {
+                      if (snapshot.data!.isEmpty) {
+                        children = const <Widget>[
+                          SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: CircularProgressIndicator(),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 16),
+                            child: Text('Nothing in Index...'),
+                          ),
+                        ];
+                      }
+                      else {
+                        children = <Widget>[
+                          ListView(
+                            shrinkWrap: true,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Text('You have '
+                                    '${snapshot.data
+                                    ?.length} entries in your index:'),
+                              ),
+                              for (var entry in snapshot.data!.entries)
+                                ListTile(
+                                  leading: const Icon(Icons.arrow_right),
+                                  title: Text(AppConstants.entryText(entry)),
+                                ),
+                            ],
+                          )
+                        ];
+                      }
+                    }
+                    else if (snapshot.hasError) {
+                      children = <Widget>[
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 60,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Text('Error: ${snapshot.error}'),
+                        ),
+                      ];
+                    }
+                    else {
+                      children = const <Widget>[
+                        SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: CircularProgressIndicator(),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 16),
+                          child: Text('Loading Index...'),
+                        ),
+                      ];
+                    }
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: children,
+                      ),
+                    );
+                  }
+                ),
             ),
             const Text(
-              'Persistence verifier -- You have pushed the button this many times:',
+            'Persistence verifier -- You have pushed the button this many times:',
             ),
             Text(
               '$_counter',
@@ -147,3 +207,31 @@ class _MyHomePageState extends State<MyHomePage> {
   //   return state.addToIndex(key, val);
   // }
 }
+
+// class IndexList extends StatelessWidget {
+//   const IndexList({
+//     Key? key,
+//     required this.appState,
+//   }) : super(key: key);
+//
+//   final AppState appState;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView(
+//       children: [
+//         Padding(
+//           padding: const EdgeInsets.all(20),
+//           child: Text('You have '
+//               '${appState.
+//               .length} entries in your index:'),
+//         ),
+//         for (var entry in appState.index.entries)
+//           ListTile(
+//             leading: const Icon(Icons.arrow_right),
+//             title: Text(AppConstants.entryText(entry)),
+//           ),
+//       ],
+//     );
+//   }
+// }

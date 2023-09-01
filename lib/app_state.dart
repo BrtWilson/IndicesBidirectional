@@ -5,9 +5,9 @@ class AppState extends ChangeNotifier {
   late Map<String, String> index;
   late Map<String, String> reverse;
 
-  Future<int> initialize() async {
-    _setIndices();
-    return 0;
+  Future<Map<String,String>> initialize() async {
+    await _setIndices();
+    return index;
   }
 
   Future<int> readCounter() async {
@@ -27,9 +27,10 @@ class AppState extends ChangeNotifier {
     _updateRemote();
   }
 
-  void _setIndices() async {
+  Future<int> _setIndices() async {
     index = await LocalStore.getInstance().readIndex();
     reverse = index.map((k, v) => MapEntry(v, k));
+    return 0;
   }
 
   bool addToIndex(String key, String val) {
