@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'Persistence/local_store.dart';
 
 class AppState extends ChangeNotifier {
+  static const bool DEBUG = true;
   late Map<String, String> index;
   late Map<String, String> reverse;
 
@@ -18,9 +19,9 @@ class AppState extends ChangeNotifier {
     LocalStore.getInstance().writeCounter(counter);
   }
 
-  Future<Map<String,String>> readIndex() async {
-    return index;
-  }
+  // Future<Map<String,String>> readIndex() async {
+  //   return index;
+  // }
 
   void overwriteIdx(Map<String,String> idx) async {
     index = idx;
@@ -34,13 +35,17 @@ class AppState extends ChangeNotifier {
   }
 
   bool addToIndex(String key, String val) {
+    if (DEBUG) print("Add to Index - app state start.");
     if (index.containsKey(key)) return false;
     index[key] = val;
     _updateRemote();
+    if (DEBUG) print("Add to Index - app state end.");
     return true;
   }
 
   void _updateRemote() {
+    if (DEBUG) print("Add to Index - update remote start.");
     LocalStore.getInstance().writeIndex(index);
+    if (DEBUG) print("Add to Index - update remote end.");
   }
 }

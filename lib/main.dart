@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
           primaryColorDark: Colors.black,
           primaryColorLight: Colors.blueGrey
         ),
-        home: const MyHomePage(title: 'Flutter Demo Home Page'),
+        home: const MyHomePage(title: 'App Persistence Testing'),
       ),
     );
   }
@@ -47,6 +47,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  static const bool DEBUG = true;
   int _counter = 0;
   final keyController = TextEditingController();
   final valController = TextEditingController();
@@ -62,9 +63,9 @@ class _MyHomePageState extends State<MyHomePage> {
     var value = await context.read<AppState>().readCounter();
     setState(() {
       _counter = value;
+      f_index = context.read<AppState>().initialize();
     });
     _incrementCounter();
-    f_index = context.read<AppState>().initialize();
   }
 
   void _incrementCounter() {
@@ -103,7 +104,9 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 //addToIndex(appState, "", "");
                 setState(() {
+                  if (DEBUG) print("Add to Index - before button.");
                   appState.addToIndex(keyController.text, valController.text);
+                  if (DEBUG) print("Add to Index - after button.");
                 });
               },
               child: const Text("Add to Index"),
